@@ -15,3 +15,8 @@ pub async fn docker_psa() -> Result<String, String> {
 
     Ok(String::from_utf8_lossy(&output.stdout).into_owned())
 }
+
+#[tauri::command]
+pub fn stop_container(id: String) {
+    println!("Stopping container {}", id);
+}

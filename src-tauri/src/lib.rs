@@ -1,4 +1,4 @@
-use crate::commands::docker_psa;
+use crate::commands::{docker_psa, stop_container};
 use crate::window_state::WindowState;
 use serde_json::json;
 use tauri::{Manager, PhysicalSize, WindowEvent};
@@ -12,7 +12,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
-        .invoke_handler(tauri::generate_handler![docker_psa])
+        .invoke_handler(tauri::generate_handler![docker_psa, stop_container])
         .setup(|app| {
             let store = app.store("msymon_settings.json")?;
             let store_settings: WindowState = store
