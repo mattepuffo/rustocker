@@ -1,4 +1,4 @@
-use crate::commands::{docker_psa, docker_inspect, stop_container, start_container};
+use crate::commands::{docker_psa, docker_inspect, stop_container, start_container, exec_shell};
 use crate::window_state::WindowState;
 use serde_json::json;
 use tauri::{Manager, PhysicalSize, WindowEvent};
@@ -16,7 +16,8 @@ pub fn run() {
             docker_psa,
             docker_inspect,
             start_container,
-            stop_container
+            stop_container,
+            exec_shell
         ])
         .setup(|app| {
             let store = app.store("msymon_settings.json")?;

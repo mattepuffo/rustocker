@@ -2,6 +2,7 @@ import {createSignal, onMount, For, Show, createEffect, onCleanup} from "solid-j
 import {invoke} from "@tauri-apps/api/core";
 import {FaSolidInfo, FaSolidPlayCircle, FaSolidStop} from "solid-icons/fa";
 import ModalInfo from "./ModalInfo.tsx";
+import {VsTerminalCmd} from "solid-icons/vs";
 
 export default function DockerPsa() {
     const [containers, setContainers] = createSignal<Container[]>([]);
@@ -81,6 +82,15 @@ export default function DockerPsa() {
         }
     };
 
+    const execShell = async (id: string) => {
+        try {
+            await invoke<string>("exec_shell", {id});
+        } catch (error) {
+            const message = typeof error === "string" ? error : String(error);
+            alert(message);
+        }
+    };
+
     return (
         <div class="container is-fluid mt-5">
             <div class="level">
@@ -111,7 +121,7 @@ export default function DockerPsa() {
                             <th>Names</th>
                             <th>Image</th>
                             <th>Status</th>
-                            <th style={{width: "120px"}}></th>
+                            <th style={{width: "160px"}}></th>
                         </tr>
                     </thead>
 
@@ -155,7 +165,7 @@ export default function DockerPsa() {
                                             </button>
 
                                             {isRunning ? (
-                                                <button class="button is-small is-danger"
+                                                <button class="button is-small is-danger mr-3"
                                                         title="Stop"
                                                         onClick={() => stopContainer(c.ID)}>
                                                     <FaSolidStop/>
@@ -167,6 +177,14 @@ export default function DockerPsa() {
                                                     <FaSolidPlayCircle/>
                                                 </button>
                                             )}
+
+                                            {isRunning ? (
+                                                <button class="button is-small is-warning"
+                                                        title="Exec shell"
+                                                        onClick={() => execShell(c.ID)}>
+                                                    <VsTerminalCmd/>
+                                                </button>
+                                            ) : ''}
 
                                         </td>
                                     </tr>
