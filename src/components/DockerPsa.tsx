@@ -1,15 +1,22 @@
-import {createSignal, onMount, For, Show} from "solid-js";
+import {createSignal, onMount, For, Show, createEffect, onCleanup} from "solid-js";
 import {invoke} from "@tauri-apps/api/core";
 import {FaSolidInfo, FaSolidPlayCircle, FaSolidStop} from "solid-icons/fa";
+import ModalInfo from "./ModalInfo.tsx";
 
 export default function DockerPsa() {
     const [containers, setContainers] = createSignal<Container[]>([]);
     const [loading, setLoading] = createSignal(false);
     const [error, setError] = createSignal<string | null>(null);
+    const [isOpen, setIsOpen] = createSignal(false);
+    const [containerId, setContainerId] = createSignal<string>();
+    const [inspectData, setInspectData] = createSignal<string | null>(null);
+    const [inspectLoading, setInspectLoading] = createSignal(false);
+    const [inspectError, setInspectError] = createSignal<string | null>(null);
 
     const loadContainers = async () => {
         setLoading(true);
         setError(null);
+
         try {
             const raw = await invoke<string>("docker_psa");
             const lines = raw.trim().split("\n").filter(Boolean);
@@ -21,6 +28,34 @@ export default function DockerPsa() {
             setLoading(false);
         }
     };
+
+    createEffect(() => {
+        if (!isOpen() || !containerId()) return;
+
+        setInspectData(null);
+        setInspectError(null);
+        setInspectLoading(true);
+
+        const handleKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setIsOpen(false);
+        };
+
+        window.addEventListener("keydown", handleKey);
+        onCleanup(() => window.removeEventListener("keydown", handleKey));
+
+        invoke<string>("docker_inspect", {id: containerId()!})
+            .then((result) => {
+                const pretty = JSON.stringify(JSON.parse(result), null, 2);
+                setInspectData(pretty);
+                // setInspectData(result);
+            })
+            .catch((err) => {
+                setInspectError(String(err));
+            })
+            .finally(() => {
+                setInspectLoading(false);
+            });
+    });
 
     onMount(() => {
         loadContainers();
@@ -69,7 +104,7 @@ export default function DockerPsa() {
                             <th style={{width: "120px"}}></th>
                         </tr>
                     </thead>
-                    
+
                     <tbody>
                         <For each={containers()}>
                             {(c) => {
@@ -101,7 +136,11 @@ export default function DockerPsa() {
                                         <td>
                                             <button class="button is-small is-info mr-3 js-modal-trigger"
                                                     data-target="modal_info"
-                                                    title="Info">
+                                                    title="Info"
+                                                    onClick={() => {
+                                                        setIsOpen(true);
+                                                        setContainerId(c.ID);
+                                                    }}>
                                                 <FaSolidInfo/>
                                             </button>
 
@@ -134,23 +173,15 @@ export default function DockerPsa() {
                 </p>
             </Show>
 
-            <div id="modal_info" class="modal">
-                <div class="modal-background"></div>
-                <div class="modal-card">
-                    <header class="modal-card-head">
-                        <p class="modal-card-title">Modal title</p>
-                        <button class="delete" aria-label="close"></button>
-                    </header>
-                    <section class="modal-card-body">
-                    </section>
-                    <footer class="modal-card-foot">
-                        <div class="buttons">
-                            <button class="button is-success">Save changes</button>
-                            <button class="button">Cancel</button>
-                        </div>
-                    </footer>
-                </div>
-            </div>
+            <ModalInfo
+                isOpen={isOpen()}
+                onClose={() => setIsOpen(false)}
+                title={`Inspect: ${containerId()?.slice(0, 12) ?? ""}`}
+                size="is-fullwidth"
+                loading={inspectLoading()}
+                error={inspectError()}
+                data={inspectData()}
+            />
         </div>
     );
 }
