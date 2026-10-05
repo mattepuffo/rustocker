@@ -61,14 +61,24 @@ export default function DockerPsa() {
         loadContainers();
     });
 
-    // const startContainer = async (pid: number) => {
-    //     const ok = await invoke<boolean>("start_container", {pid});
-    //     if (!ok) alert(`Impossibile terminare il processo ${pid}`);
-    // };
+    const startContainer = async (id: string) => {
+        try {
+            await invoke<string>("start_container", {id});
+            loadContainers();
+        } catch (error) {
+            const message = typeof error === "string" ? error : String(error);
+            alert(message);
+        }
+    };
 
     const stopContainer = async (id: string) => {
-        await invoke<boolean>("stop_container", {id});
-        // if (!ok) alert(`Impossibile terminare il processo ${id}`);
+        try {
+            await invoke<string>("stop_container", {id});
+            loadContainers();
+        } catch (error) {
+            const message = typeof error === "string" ? error : String(error);
+            alert(message);
+        }
     };
 
     return (
@@ -153,7 +163,7 @@ export default function DockerPsa() {
                                             ) : (
                                                 <button class="button is-small is-success"
                                                         title="Stop"
-                                                        onClick={() => stopContainer(c.ID)}>
+                                                        onClick={() => startContainer(c.ID)}>
                                                     <FaSolidPlayCircle/>
                                                 </button>
                                             )}
@@ -173,14 +183,13 @@ export default function DockerPsa() {
                 </p>
             </Show>
 
-            <ModalInfo
-                isOpen={isOpen()}
-                onClose={() => setIsOpen(false)}
-                title={`Inspect: ${containerId()?.slice(0, 12) ?? ""}`}
-                size="is-fullwidth"
-                loading={inspectLoading()}
-                error={inspectError()}
-                data={inspectData()}
+            <ModalInfo isOpen={isOpen()}
+                       onClose={() => setIsOpen(false)}
+                       title={`Inspect: ${containerId()?.slice(0, 12) ?? ""}`}
+                       size="is-fullwidth"
+                       loading={inspectLoading()}
+                       error={inspectError()}
+                       data={inspectData()}
             />
         </div>
     );

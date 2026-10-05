@@ -1,4 +1,4 @@
-use crate::commands::{docker_psa, docker_inspect, stop_container};
+use crate::commands::{docker_psa, docker_inspect, stop_container, start_container};
 use crate::window_state::WindowState;
 use serde_json::json;
 use tauri::{Manager, PhysicalSize, WindowEvent};
@@ -15,6 +15,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             docker_psa,
             docker_inspect,
+            start_container,
             stop_container
         ])
         .setup(|app| {
