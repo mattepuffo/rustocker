@@ -6,6 +6,7 @@ use tauri_plugin_store::StoreExt;
 
 mod commands;
 mod window_state;
+mod docker_helper;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
