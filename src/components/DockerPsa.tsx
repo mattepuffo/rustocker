@@ -3,6 +3,7 @@ import {invoke} from "@tauri-apps/api/core";
 import {FaSolidInfo, FaSolidPlayCircle, FaSolidStop} from "solid-icons/fa";
 import ModalInfo from "./ModalInfo.tsx";
 import {VsTerminalCmd} from "solid-icons/vs";
+import {getVersion} from "@tauri-apps/api/app";
 
 export default function DockerPsa() {
     const [containers, setContainers] = createSignal<Container[]>([]);
@@ -13,6 +14,16 @@ export default function DockerPsa() {
     const [inspectData, setInspectData] = createSignal<string | null>(null);
     const [inspectLoading, setInspectLoading] = createSignal(false);
     const [inspectError, setInspectError] = createSignal<string | null>(null);
+    const [appVersion, setAppVersion] = createSignal<string>("");
+
+    const printVersion = async () => {
+        const version = await getVersion();
+        setAppVersion(version);
+    }
+
+    onMount(() => {
+        printVersion();
+    });
 
     const loadContainers = async () => {
         setLoading(true);
@@ -60,6 +71,7 @@ export default function DockerPsa() {
 
     onMount(() => {
         loadContainers();
+        printVersion();
     });
 
     const startContainer = async (id: string) => {
@@ -95,7 +107,7 @@ export default function DockerPsa() {
         <div class="container is-fluid mt-5">
             <div class="level">
                 <div class="level-left">
-                    <h1 class="title is-4">Docker Containers</h1>
+                    <h1 class="title is-4">Docker Containers - Versione {appVersion()}</h1>
                 </div>
                 <div class="level-right">
                     <button class="button is-primary"

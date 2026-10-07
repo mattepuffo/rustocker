@@ -1,5 +1,4 @@
 use crate::docker_helper::{run_docker, spawn_external_terminal};
-use tokio::process::Command;
 
 #[tauri::command]
 pub async fn docker_psa() -> Result<String, String> {

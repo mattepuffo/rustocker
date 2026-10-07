@@ -5,10 +5,8 @@ import "./App.css";
 
 function App() {
     return (
-        <main class="container">
-            <div class="container">
-                <DockerPsa/>
-            </div>
+        <main>
+            <DockerPsa/>
         </main>
     );
 }
