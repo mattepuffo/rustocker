@@ -1,16 +1,19 @@
-use crate::commands::{docker_psa, docker_inspect, stop_container, start_container, exec_shell};
+mod commands;
+mod docker_helper;
+mod window_state;
+
+use crate::commands::{
+    docker_inspect, docker_psa, docker_system_df, exec_shell, start_container, stop_container,
+};
 use crate::window_state::WindowState;
 use serde_json::json;
 use tauri::{Manager, PhysicalSize, WindowEvent};
 use tauri_plugin_store::StoreExt;
 
-mod commands;
-mod window_state;
-mod docker_helper;
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .invoke_handler(tauri::generate_handler![
@@ -18,7 +21,8 @@ pub fn run() {
             docker_inspect,
             start_container,
             stop_container,
-            exec_shell
+            exec_shell,
+            docker_system_df
         ])
         .setup(|app| {
             let store = app.store("msymon_settings.json")?;

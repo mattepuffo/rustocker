@@ -109,6 +109,7 @@ export default function DockerPsa() {
                 <div class="level-left">
                     <h1 class="title is-4">Docker Containers - Versione {appVersion()}</h1>
                 </div>
+
                 <div class="level-right">
                     <button class="button is-primary"
                             classList={{"is-loading": loading()}}
@@ -133,6 +134,7 @@ export default function DockerPsa() {
                             <th>Names</th>
                             <th>Image</th>
                             <th>Status</th>
+                            <th>Ports</th>
                             <th style={{width: "160px"}}></th>
                         </tr>
                     </thead>
@@ -164,6 +166,8 @@ export default function DockerPsa() {
                                                 {c.Status}
                                             </span>
                                         </td>
+
+                                        <td>{c.Ports}</td>
 
                                         <td>
                                             <button class="button is-small is-info mr-3 js-modal-trigger"

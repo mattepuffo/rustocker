@@ -1,14 +1,5 @@
 import {Show} from "solid-js";
-
-interface ModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    title?: string;
-    size?: "is-small" | "is-medium" | "is-large" | "is-fullwidth";
-    loading?: boolean;
-    error?: string | null;
-    data?: string | null;
-}
+import {ModalProps} from "../models/ModalProps.ts";
 
 export default function ModalInfo(props: ModalProps) {
     return (

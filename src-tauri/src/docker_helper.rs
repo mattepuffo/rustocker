@@ -25,9 +25,9 @@ pub fn spawn_external_terminal(cmd: &str) -> std::io::Result<()> {
     const CREATE_NEW_CONSOLE: u32 = 0x00000010;
 
     Command::new("powershell")
-      .args(["-NoExit", "-Command", cmd])
-      .creation_flags(CREATE_NEW_CONSOLE)
-      .spawn()?;
+        .args(["-NoExit", "-Command", cmd])
+        .creation_flags(CREATE_NEW_CONSOLE)
+        .spawn()?;
 
     Ok(())
 }
@@ -60,10 +60,10 @@ pub fn spawn_external_terminal(cmd: &str) -> std::io::Result<()> {
 
     for (term, flags) in terminals {
         if Command::new(term)
-          .args(*flags)
-          .args(["bash", "-c", &full])
-          .spawn()
-          .is_ok()
+            .args(*flags)
+            .args(["bash", "-c", &full])
+            .spawn()
+            .is_ok()
         {
             return Ok(());
         }
