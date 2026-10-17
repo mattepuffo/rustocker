@@ -13,6 +13,8 @@ use tauri_plugin_store::StoreExt;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
@@ -68,6 +70,35 @@ pub fn run() {
                     }
                 }
             });
+
+            #[cfg(desktop)]
+            {
+                use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
+
+                let platform = tauri_plugin_os::platform();
+                if platform == "macos" {
+                    let quit_shortcut = Shortcut::new(Some(Modifiers::META), Code::KeyQ);
+
+                    app.handle().plugin(
+                        tauri_plugin_global_shortcut::Builder::new()
+                            .with_handler(move |app, shortcut, event| {
+                                if shortcut == &quit_shortcut {
+                                    match event.state() {
+                                        ShortcutState::Pressed => {
+                                            app.exit(0);
+                                        }
+                                        ShortcutState::Released => {
+                                            println!("Ctrl-N Released!");
+                                        }
+                                    }
+                                }
+                            })
+                            .build(),
+                    )?;
+
+                    app.global_shortcut().register(quit_shortcut)?;
+                }
+            }
 
             Ok(())
         })
