@@ -4,6 +4,7 @@ import {FaSolidInfo, FaSolidPlayCircle, FaSolidStop} from "solid-icons/fa";
 import ModalInfo from "./ModalInfo.tsx";
 import {VsTerminalCmd} from "solid-icons/vs";
 import {getVersion} from "@tauri-apps/api/app";
+import MenuBar from "./MenuBar.tsx";
 
 export default function DockerPsa() {
     const [containers, setContainers] = createSignal<Container[]>([]);
@@ -120,13 +121,15 @@ export default function DockerPsa() {
                 </div>
             </div>
 
+            <MenuBar/>
+
             <Show when={error()}>
                 <div class="notification is-danger is-light">
                     {error()}
                 </div>
             </Show>
 
-            <div class="table-container">
+            <div class="table-container mt-4">
                 <table class="table is-bordered is-fullwidth is-striped is-hoverable">
                     <thead>
                         <tr>
