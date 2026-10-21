@@ -8,6 +8,7 @@ export interface ModalProps {
     loading?: boolean;
     error?: string | null;
     data?: string | null;
+    colorCard?: string | null;
 }
 
 export interface ModalPropsDf {

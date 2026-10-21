@@ -3,6 +3,7 @@ import {FaSolidAngleDown} from "solid-icons/fa";
 import ModalDockerSystemDf from "./ModalDockerSystemDf.tsx";
 import {invoke} from "@tauri-apps/api/core";
 import {DockerDfItem} from "./DockerDfItem.ts";
+import ModalGeneric from "./ModalGeneric.tsx";
 
 export default function MenuBar() {
     const [isActive, setIsActive] = createSignal(false);
@@ -10,6 +11,11 @@ export default function MenuBar() {
     const [data, setData] = createSignal<DockerDfItem[]>([]);
     const [inspectLoading, setInspectLoading] = createSignal(false);
     const [inspectError, setInspectError] = createSignal<string | null>(null);
+    const [isOpenInfo, setIsOpenInfo] = createSignal(false);
+    const [modalCleanColor, setModalCleanColor] = createSignal<string | null>(null);
+    const [dataClean, setDataClean] = createSignal<string | null>(null);
+    const [inspectLoadingClean, setInspectLoadingClean] = createSignal(false);
+    const [inspectErrorClean, setInspectErrorClean] = createSignal<string | null>(null);
 
     let dropdownRef: HTMLDivElement | undefined;
 
@@ -53,6 +59,26 @@ export default function MenuBar() {
         });
     });
 
+    const cleanupDocker = async () => {
+        setDataClean('');
+        setInspectErrorClean(null);
+        setInspectLoadingClean(true);
+        setIsOpenInfo(true);
+
+        invoke<string>("cleanup_docker")
+            .then((result) => {
+                setModalCleanColor('has-background-primary has-text-primary-invert');
+                setDataClean(String(result));
+            })
+            .catch((err) => {
+                setModalCleanColor('has-background-danger has-text-danger-invert');
+                setInspectErrorClean(String(err));
+            })
+            .finally(() => {
+                setInspectLoadingClean(false);
+            });
+    }
+
     const quitApp = async () => {
         const {exit} = await import('@tauri-apps/plugin-process');
         await exit(0);
@@ -82,6 +108,12 @@ export default function MenuBar() {
                         }}>
                             Docker System Df
                         </a>
+                        <a href="#" class="dropdown-item" onClick={() => {
+                            setIsActive(!isActive());
+                            cleanupDocker();
+                        }}>
+                            Docker Clean
+                        </a>
                         <hr class="dropdown-divider"/>
                         <a href="#" class="dropdown-item" onClick={() => quitApp()}>Quit</a>
                     </div>
@@ -95,6 +127,16 @@ export default function MenuBar() {
                                  loading={inspectLoading()}
                                  error={inspectError()}
                                  data={data()}
+            />
+
+            <ModalGeneric isOpen={isOpenInfo()}
+                          onClose={() => setIsOpenInfo(false)}
+                          title="CIAO"
+                          size="is-fullwidth"
+                          loading={inspectLoadingClean()}
+                          error={inspectErrorClean()}
+                          data={dataClean()}
+                          colorCard={modalCleanColor()}
             />
         </>
     );

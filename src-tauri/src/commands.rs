@@ -94,3 +94,47 @@ pub async fn docker_system_df() -> Result<String, String> {
 
     serde_json::to_string(&items).map_err(|e| e.to_string())
 }
+
+#[tauri::command]
+pub async fn cleanup_docker() -> Result<String, String> {
+    let commands: &[&[&str]] = &[
+        &["image", "prune", "-a", "-f"],
+        &["volume", "prune", "-f"],
+        &["builder", "prune", "-f"],
+        &["network", "prune", "-f"],
+    ];
+
+    let mut full_output = String::new();
+
+    for args in commands {
+        let output = run_docker(args).await?;
+
+        full_output.push_str(&format!("=== docker {} ===\n", args.join(" ")));
+
+        if !output.stdout.is_empty() {
+            full_output.push_str(&String::from_utf8_lossy(&output.stdout));
+            if !full_output.ends_with('\n') {
+                full_output.push('\n');
+            }
+        }
+
+        if !output.stderr.is_empty() {
+            full_output.push_str(&String::from_utf8_lossy(&output.stderr));
+            if !full_output.ends_with('\n') {
+                full_output.push('\n');
+            }
+        }
+
+        if !output.status.success() {
+            return Err(format!(
+                "Comando fallito: docker {}\n\nOutput finora:\n{}",
+                args.join(" "),
+                full_output
+            ));
+        }
+
+        full_output.push('\n');
+    }
+
+    Ok(full_output)
+}

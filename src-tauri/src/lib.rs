@@ -2,9 +2,7 @@ mod commands;
 mod docker_helper;
 mod window_state;
 
-use crate::commands::{
-    docker_inspect, docker_psa, docker_system_df, exec_shell, start_container, stop_container,
-};
+use crate::commands::{cleanup_docker, docker_inspect, docker_psa, docker_system_df, exec_shell, start_container, stop_container};
 use crate::window_state::WindowState;
 use serde_json::json;
 use tauri::{Manager, PhysicalSize, WindowEvent};
@@ -24,7 +22,8 @@ pub fn run() {
             start_container,
             stop_container,
             exec_shell,
-            docker_system_df
+            docker_system_df,
+            cleanup_docker
         ])
         .setup(|app| {
             let store = app.store("msymon_settings.json")?;
