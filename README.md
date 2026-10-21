@@ -21,3 +21,9 @@ npm run tauri build -- --target universal-apple-darwin
 
 **TODO**
 - crea container con opzioni
+
+----
+
+#### RELEASES:
+- [Linux AppImage](https://www.mattepuffo.com/DOWNLOAD/rustocker_linux.zip)
+- [Windows](https://www.mattepuffo.com/DOWNLOAD/rustocker_windows.zip)
