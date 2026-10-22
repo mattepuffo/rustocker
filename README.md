@@ -21,6 +21,7 @@ npm run tauri build -- --target universal-apple-darwin
 
 **TODO**
 - crea container con opzioni
+- docker stats (https://docs.docker.com/reference/cli/docker/container/stats/)
 
 ----
 
