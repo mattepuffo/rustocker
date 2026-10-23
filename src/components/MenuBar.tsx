@@ -3,7 +3,8 @@ import {FaSolidAngleDown} from "solid-icons/fa";
 import ModalDockerSystemDf from "./ModalDockerSystemDf.tsx";
 import {invoke} from "@tauri-apps/api/core";
 import {DockerDfItem} from "./DockerDfItem.ts";
-import ModalGeneric from "./ModalGeneric.tsx";
+import ModalClean from "./ModalClean.tsx";
+import ModalStats from "./ModalStats.tsx";
 
 export default function MenuBar() {
     const [isActive, setIsActive] = createSignal(false);
@@ -16,6 +17,7 @@ export default function MenuBar() {
     const [dataClean, setDataClean] = createSignal<string | null>(null);
     const [inspectLoadingClean, setInspectLoadingClean] = createSignal(false);
     const [inspectErrorClean, setInspectErrorClean] = createSignal<string | null>(null);
+    const [isOpenStats, setIsOpenStats] = createSignal(false);
 
     let dropdownRef: HTMLDivElement | undefined;
 
@@ -108,13 +110,22 @@ export default function MenuBar() {
                         }}>
                             Docker System Df
                         </a>
+
                         <a href="#" class="dropdown-item" onClick={() => {
                             setIsActive(!isActive());
                             cleanupDocker();
                         }}>
                             Docker Clean
                         </a>
+
+                        <a href="#" class="dropdown-item" onClick={() => {
+                            setIsOpenStats(true);
+                        }}>
+                            Docker Stats
+                        </a>
+
                         <hr class="dropdown-divider"/>
+
                         <a href="#" class="dropdown-item" onClick={() => quitApp()}>Quit</a>
                     </div>
                 </div>
@@ -129,14 +140,21 @@ export default function MenuBar() {
                                  data={data()}
             />
 
-            <ModalGeneric isOpen={isOpenInfo()}
-                          onClose={() => setIsOpenInfo(false)}
-                          title="CIAO"
-                          size="is-fullwidth"
-                          loading={inspectLoadingClean()}
-                          error={inspectErrorClean()}
-                          data={dataClean()}
-                          colorCard={modalCleanColor()}
+            <ModalClean isOpen={isOpenInfo()}
+                        onClose={() => setIsOpenInfo(false)}
+                        title="Clean"
+                        size="is-fullwidth"
+                        loading={inspectLoadingClean()}
+                        error={inspectErrorClean()}
+                        data={dataClean()}
+                        colorCard={modalCleanColor()}
+            />
+
+            <ModalStats isOpen={isOpenStats()}
+                        onClose={() => setIsOpenStats(false)}
+                        title="Stats"
+                        size="is-fullwidth"
+
             />
         </>
     );

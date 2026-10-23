@@ -20,3 +20,13 @@ export interface ModalPropsDf {
     error?: string | null;
     data?: DockerDfItem[] | null;
 }
+
+export interface ModalPropsStats {
+    isOpen: boolean;
+    onClose: () => void;
+    title?: string;
+    size?: "is-small" | "is-medium" | "is-large" | "is-fullwidth";
+    loading?: boolean;
+    error?: string | null;
+    data?: string | null;
+}

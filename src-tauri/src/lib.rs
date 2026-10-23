@@ -2,7 +2,7 @@ mod commands;
 mod docker_helper;
 mod window_state;
 
-use crate::commands::{cleanup_docker, docker_inspect, docker_psa, docker_system_df, exec_shell, start_container, stop_container};
+use crate::commands::{cleanup_docker, docker_inspect, docker_psa, docker_stats, docker_system_df, exec_shell, start_container, stop_container};
 use crate::window_state::WindowState;
 use serde_json::json;
 use tauri::{Manager, PhysicalSize, WindowEvent};
@@ -11,7 +11,6 @@ use tauri_plugin_store::StoreExt;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        // .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_opener::init())
@@ -23,7 +22,8 @@ pub fn run() {
             stop_container,
             exec_shell,
             docker_system_df,
-            cleanup_docker
+            cleanup_docker,
+            docker_stats
         ])
         .setup(|app| {
             let store = app.store("msymon_settings.json")?;

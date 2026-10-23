@@ -1,7 +1,7 @@
 import {ModalProps} from "../models/ModalProps.ts";
 import {Show} from "solid-js";
 
-export default function ModalGeneric(props: ModalProps) {
+export default function ModalClean(props: ModalProps) {
     return (
         <div class={`modal ${props.isOpen ? "is-active" : ""}`}
              onClick={(e) => e.stopPropagation()}>

@@ -138,3 +138,26 @@ pub async fn cleanup_docker() -> Result<String, String> {
 
     Ok(full_output)
 }
+
+#[tauri::command]
+pub async fn docker_stats() -> Result<String, String> {
+    let output = run_docker(&["stats", "-a", "--no-stream", "--no-trunc", "--format", "{{json .}}"]).await?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!("Docker command failed: {}", stderr));
+    }
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+
+    let items: Vec<serde_json::Value> = stdout
+        .lines()
+        .filter(|line| !line.trim().is_empty())
+        .map(|line| {
+            serde_json::from_str(line)
+                .map_err(|e| format!("Failed to parse line '{}': {}", line, e))
+        })
+        .collect::<Result<_, _>>()?;
+
+    serde_json::to_string(&items).map_err(|e| e.to_string())
+}
