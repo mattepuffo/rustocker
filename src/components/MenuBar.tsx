@@ -137,8 +137,7 @@ export default function MenuBar() {
                                  size="is-fullwidth"
                                  loading={inspectLoading()}
                                  error={inspectError()}
-                                 data={data()}
-            />
+                                 data={data()}/>
 
             <ModalClean isOpen={isOpenInfo()}
                         onClose={() => setIsOpenInfo(false)}
@@ -147,15 +146,12 @@ export default function MenuBar() {
                         loading={inspectLoadingClean()}
                         error={inspectErrorClean()}
                         data={dataClean()}
-                        colorCard={modalCleanColor()}
-            />
+                        colorCard={modalCleanColor()}/>
 
             <ModalStats isOpen={isOpenStats()}
                         onClose={() => setIsOpenStats(false)}
                         title="Stats"
-                        size="is-fullwidth"
-
-            />
+                        size="is-fullwidth"/>
         </>
     );
 }

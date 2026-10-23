@@ -12,11 +12,11 @@ export default function ModalStats(props: ModalPropsStats) {
     onMount(() => {
         const getStats = async () => {
             try {
-                // loading grosso solo la prima volta
                 if (stats().length === 0) setLoading(true);
 
                 const result = await invoke<string>("docker_stats");
                 const parsed = JSON.parse(result);
+
                 setStats(parsed);
                 setError(null);
             } catch (err) {
@@ -27,6 +27,7 @@ export default function ModalStats(props: ModalPropsStats) {
         };
 
         getStats();
+
         interval = window.setInterval(getStats, 2000);
     });
 
@@ -35,24 +36,18 @@ export default function ModalStats(props: ModalPropsStats) {
     });
 
     return (
-        <div
-            class={`modal ${props.isOpen ? "is-active" : ""}`}
-            onClick={(e) => e.stopPropagation()}
-        >
+        <div class={`modal ${props.isOpen ? "is-active" : ""}`}
+             onClick={(e) => e.stopPropagation()}>
+
             <div class="modal-background" onClick={props.onClose}></div>
 
             <div class={`modal-card ${props.size ?? ""}`}>
                 <header class="modal-card-head">
                     <p class="modal-card-title">{props.title ?? "Stats"}</p>
-                    <button
-                        class="delete"
-                        aria-label="close"
-                        onClick={props.onClose}
-                    />
+                    <button class="delete" aria-label="close" onClick={props.onClose}/>
                 </header>
 
                 <section class="modal-card-body">
-                    {/* Spinner solo al primo caricamento */}
                     <Show when={loading() && stats().length === 0}>
                         <div class="has-text-centered py-6">
                             <button class="button is-loading is-ghost is-large"/>
@@ -60,17 +55,15 @@ export default function ModalStats(props: ModalPropsStats) {
                         </div>
                     </Show>
 
-                    {/* Errore */}
                     <Show when={error()}>
                         <div class="notification is-danger is-light">
                             {error()}
                         </div>
                     </Show>
 
-                    {/* Tabella stats */}
                     <Show when={stats().length > 0}>
                         <div class="table-container">
-                            <table class="table is-fullwidth is-striped is-hoverable is-size-7">
+                            <table class="table is-bordered is-fullwidth is-striped is-hoverable">
                                 <thead>
                                     <tr>
                                         <th>Container</th>
@@ -82,6 +75,7 @@ export default function ModalStats(props: ModalPropsStats) {
                                         <th>PIDs</th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     <For each={stats()}>
                                         {(item) => (

@@ -27,6 +27,4 @@ export interface ModalPropsStats {
     title?: string;
     size?: "is-small" | "is-medium" | "is-large" | "is-fullwidth";
     loading?: boolean;
-    error?: string | null;
-    data?: string | null;
 }
