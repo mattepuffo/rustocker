@@ -141,7 +141,15 @@ pub async fn cleanup_docker() -> Result<String, String> {
 
 #[tauri::command]
 pub async fn docker_stats() -> Result<String, String> {
-    let output = run_docker(&["stats", "-a", "--no-stream", "--no-trunc", "--format", "{{json .}}"]).await?;
+    let output = run_docker(&[
+        "stats",
+        "-a",
+        "--no-stream",
+        "--no-trunc",
+        "--format",
+        "{{json .}}",
+    ])
+    .await?;
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
@@ -160,4 +168,16 @@ pub async fn docker_stats() -> Result<String, String> {
         .collect::<Result<_, _>>()?;
 
     serde_json::to_string(&items).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn remove_container(id: String) -> Result<String, String> {
+    let output = run_docker(&["rm", "-v", id.as_str()]).await?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!("Docker command failed: {}", stderr));
+    }
+
+    Ok(String::from_utf8_lossy(&output.stdout).into_owned())
 }

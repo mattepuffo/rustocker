@@ -1,10 +1,11 @@
 import {createSignal, onMount, For, Show, createEffect, onCleanup} from "solid-js";
 import {invoke} from "@tauri-apps/api/core";
-import {FaSolidInfo, FaSolidPlayCircle, FaSolidStop} from "solid-icons/fa";
+import {FaSolidInfo, FaSolidPlayCircle, FaSolidStop, FaSolidTrash} from "solid-icons/fa";
 import ModalInfo from "./ModalInfo.tsx";
 import {VsTerminalCmd} from "solid-icons/vs";
 import {getVersion} from "@tauri-apps/api/app";
 import MenuBar from "./MenuBar.tsx";
+import {confirm} from '@tauri-apps/plugin-dialog';
 
 export default function DockerPsa() {
     const [containers, setContainers] = createSignal<Container[]>([]);
@@ -104,6 +105,23 @@ export default function DockerPsa() {
         }
     };
 
+    const removeContainer = async (id: string) => {
+        const confirmation = await confirm(
+            'Sei sicuro di voler cancellare il container?',
+            {title: 'ATTENZIONE!'}
+        );
+
+        if (confirmation) {
+            try {
+                await invoke<string>("remove_container", {id});
+                loadContainers();
+            } catch (error) {
+                const message = typeof error === "string" ? error : String(error);
+                alert(message);
+            }
+        }
+    };
+
     return (
         <div class="container is-fluid mt-5">
             <div class="level">
@@ -138,7 +156,7 @@ export default function DockerPsa() {
                             <th>Image</th>
                             <th>Status</th>
                             <th>Ports</th>
-                            <th style={{width: "160px"}}></th>
+                            <th style={{width: "230px"}}></th>
                         </tr>
                     </thead>
 
@@ -184,13 +202,13 @@ export default function DockerPsa() {
                                             </button>
 
                                             {isRunning ? (
-                                                <button class="button is-small is-danger mr-3"
+                                                <button class="button is-small is-link mr-3"
                                                         title="Stop"
                                                         onClick={() => stopContainer(c.ID)}>
                                                     <FaSolidStop/>
                                                 </button>
                                             ) : (
-                                                <button class="button is-small is-success"
+                                                <button class="button is-small is-success mr-3"
                                                         title="Stop"
                                                         onClick={() => startContainer(c.ID)}>
                                                     <FaSolidPlayCircle/>
@@ -198,12 +216,21 @@ export default function DockerPsa() {
                                             )}
 
                                             {isRunning ? (
-                                                <button class="button is-small is-warning"
+                                                <button class="button is-small is-warning mr-3"
                                                         title="Exec shell"
                                                         onClick={() => execShell(c.ID)}>
                                                     <VsTerminalCmd/>
                                                 </button>
                                             ) : ''}
+
+                                            <button class="button is-small is-danger mr-3 js-modal-trigger"
+                                                    data-target="modal_info"
+                                                    title="Delete"
+                                                    onClick={() => {
+                                                        removeContainer(c.ID);
+                                                    }}>
+                                                <FaSolidTrash/>
+                                            </button>
 
                                         </td>
                                     </tr>
