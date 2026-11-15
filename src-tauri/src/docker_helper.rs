@@ -1,18 +1,18 @@
-use tokio::process::Command;
+use crate::process_helpers::hidden_command;
 
 pub async fn run_docker(args: &[&str]) -> Result<std::process::Output, String> {
     if cfg!(target_os = "windows") {
         // Opzionale: puoi specificare la distro se non è quella di default
         // .args(["-d", "Ubuntu", "docker"].into_iter().chain(args.iter().copied()))
 
-        Command::new("wsl")
+        hidden_command("wsl")
             .arg("docker")
             .args(args)
             .output()
             .await
             .map_err(|e| format!("wsl docker failed: {}", e))
     } else {
-        Command::new("docker")
+        hidden_command("docker")
             .args(args)
             .output()
             .await
@@ -24,7 +24,7 @@ pub async fn run_docker(args: &[&str]) -> Result<std::process::Output, String> {
 pub fn spawn_external_terminal(cmd: &str) -> std::io::Result<()> {
     const CREATE_NEW_CONSOLE: u32 = 0x00000010;
 
-    Command::new("powershell")
+    hidden_command("powershell")
         .args(["-NoExit", "-Command", cmd])
         .creation_flags(CREATE_NEW_CONSOLE)
         .spawn()?;
@@ -39,7 +39,7 @@ pub fn spawn_external_terminal(cmd: &str) -> std::io::Result<()> {
         cmd.replace('\\', "\\\\").replace('"', "\\\"")
     );
 
-    Command::new("osascript").args(["-e", &script]).spawn()?;
+    hidden_command("osascript").args(["-e", &script]).spawn()?;
 
     Ok(())
 }
@@ -59,7 +59,7 @@ pub fn spawn_external_terminal(cmd: &str) -> std::io::Result<()> {
     let full = format!("{cmd}; exec $SHELL");
 
     for (term, flags) in terminals {
-        if Command::new(term)
+        if hidden_command(term)
             .args(*flags)
             .args(["bash", "-c", &full])
             .spawn()

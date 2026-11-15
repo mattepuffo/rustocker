@@ -1,6 +1,7 @@
 mod commands;
 mod docker_helper;
 mod window_state;
+mod process_helpers;
 
 use crate::commands::{cleanup_docker, docker_inspect, docker_psa, remove_container, docker_stats, docker_system_df, exec_shell, start_container, stop_container};
 use crate::window_state::WindowState;
