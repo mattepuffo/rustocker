@@ -21,7 +21,7 @@ npm run tauri build -- --target universal-apple-darwin
 
 **TODO**
 - crea container con opzioni
-- identificare volumi orfani
+- controllare e pulire logs container
 
 ----
 
